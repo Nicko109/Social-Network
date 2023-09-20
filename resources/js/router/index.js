@@ -5,23 +5,33 @@ const router = createRouter( {
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
-            path: '/user/index',
+            path: '/users/index',
             name: 'user.index',
             component: () => import('../views/user/Index.vue')
         },
+        {
+            path: '/users/:id/show',
+            name: 'user.show',
+            component: () => import('../views/user/Show.vue')
+        },
+        {
+            path: '/users/feed',
+            name: 'user.feed',
+            component: () => import('../views/user/Feed.vue')
+        },
 
         {
-            path: '/user/login',
+            path: '/users/login',
             name: 'user.login',
             component: () => import('../views/user/Login.vue')
         },
         {
-            path: '/user/registration',
+            path: '/users/registration',
             name: 'user.registration',
             component: () => import('../views/user/Registration.vue')
         },
         {
-            path: '/user/personal',
+            path: '/users/personal',
             name: 'user.personal',
             component: () => import('../views/user/Personal.vue')
         },

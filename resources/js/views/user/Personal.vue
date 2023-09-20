@@ -12,7 +12,7 @@
             <div class="flex mb-3 items-center">
                 <div>
                     <input @change="storeImage" ref="file" type="file" class="hidden">
-                    <a href="" class="block text-center text-sm w-16 p-2 bg-sky-500 rounded-3xl text-white
+                    <a href="#" class="block text-center text-sm w-16 p-2 bg-sky-500 rounded-3xl text-white
             hover:bg-white hover:border hover:border-sky-600 hover:text-sky-600 box-border"
                        @click.prevent="selectFile()">Image</a>
                 </div>
@@ -30,12 +30,7 @@
         </div>
         <div v-if="posts">
             <h1 class="mb-8 pb-8 border-b border-gray-400">Posts</h1>
-            <div v-for="post in posts" class="mb-8 pb-8 border-b border-gray-400">
-                <h1 class="text-xl">{{ post.title }}</h1>
-                <img class="my-3 mx-auto" v-if="post.image_url" :src="post.image_url" :alt="post.title">
-                <p>{{ post.content }}</p>
-                <p class="mt-2 text-right text-slate-500 text-sm">{{ post.date }}</p>
-            </div>
+            <Post v-for="post in posts" :post="post"></Post>
         </div>
 
     </div>
@@ -43,6 +38,7 @@
 
 <script>
 import axios from "axios";
+import Post from "../../Post/Post.vue";
 
 export default {
     name: "Personal",
@@ -54,6 +50,10 @@ export default {
             image: null,
             posts: [],
         }
+    },
+
+    components: {
+        Post
     },
 
     mounted() {
