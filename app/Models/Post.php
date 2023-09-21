@@ -14,7 +14,9 @@ class Post extends Model
 
     protected $table = 'posts';
 
-    protected $with = ['image', 'likedUsers'];
+    protected $withCount = ['comments'];
+
+    protected $with = ['image', 'likedUsers', 'repostedPost'];
 
     public function image() {
 
@@ -32,6 +34,20 @@ class Post extends Model
         return $this->created_at->diffForHumans();
     }
 
+    public function repostedPost()
+    {
+        return $this->belongsTo(Post::class, 'reposted_id', 'id');
+    }
+
+    public function repostedByPosts()
+    {
+        return $this->hasMany(Post::class, 'reposted_id', 'id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'post_id', 'id', );
+    }
 
 
 

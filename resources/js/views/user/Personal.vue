@@ -1,19 +1,25 @@
 <template>
     <div class="w-96 mx-auto">
         <div class="mb-4">
-            <div>
-                <input v-model="title" class="w-96  rounded-3xl p-2 border border-slate-300 mb-3" type="text"
+            <div class=" mb-3">
+                <input v-model="title" class="w-96 rounded-3xl border p-2 border-slate-300" type="text"
                        placeholder="title">
+                <div v-if="errors.title">
+                    <p v-for="error in errors.title" class="text-sm mt-2 text-red-500">{{ error }}</p>
+                </div>
             </div>
-            <div>
-            <textarea v-model="content" class="w-96  rounded-3xl p-2 border border-slate-300 mb-3"
-                      placeholder="content"></textarea>
+            <div class=" mb-3">
+                <textarea v-model="content" class="w-96 rounded-3xl border p-2 border-slate-300"
+                          placeholder="content"></textarea>
+                <div v-if="errors.content">
+                    <p v-for="error in errors.content" class="text-sm mb-2 text-red-500">{{ error }}</p>
+                </div>
             </div>
             <div class="flex mb-3 items-center">
                 <div>
                     <input @change="storeImage" ref="file" type="file" class="hidden">
                     <a href="#" class="block text-center text-sm w-16 p-2 bg-sky-500 rounded-3xl text-white
-            hover:bg-white hover:border hover:border-sky-600 hover:text-sky-600 box-border"
+            hover:bg-white border hover:border-sky-600 hover:text-sky-600 box-border"
                        @click.prevent="selectFile()">Image</a>
                 </div>
                 <div>
@@ -25,7 +31,7 @@
             </div>
             <div>
                 <a @click.prevent="store" href="#" class="block text-center w-32 p-2 bg-green-500 rounded-3xl text-white
-            hover:bg-white hover:border hover:border-green-600 hover:text-green-600 box-border ml-auto">Publish</a>
+            hover:bg-white  border hover:border-green-600 hover:text-green-600 box-border ml-auto">Publish</a>
             </div>
         </div>
         <div v-if="posts">
@@ -49,6 +55,7 @@ export default {
             content: '',
             image: null,
             posts: [],
+            errors: [],
         }
     },
 
@@ -78,6 +85,9 @@ export default {
                     this.image = null
                     this.posts.unshift(res.data.data)
                 })
+            .catch(e => {
+                this.errors = e.response.data.errors
+            })
         },
 
         selectFile() {
