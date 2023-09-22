@@ -12,7 +12,7 @@ class Comment extends Model
 
     protected $table = 'comments';
 
-    protected $with = ['user'];
+    protected $with = ['user', 'parent'];
 
     public function user()
     {
@@ -21,5 +21,10 @@ class Comment extends Model
 
     public function getDateAttribute() {
         return $this->created_at->diffForHumans();
+    }
+
+    public function parent()
+    {
+       return $this->belongsTo(Comment::class, 'parent_id', 'id');
     }
 }

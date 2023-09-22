@@ -1,12 +1,15 @@
 <template>
     <div class="mb-8 pb-8 border-b border-gray-400">
         <h1 class="text-xl">{{ post.title }}</h1>
+        <router-link class="text-sm text-gray-700" :to="{ name: 'user.show', params: {id: post.user.id}}">{{ post.user.name}}</router-link>
         <img class="my-3 mx-auto" v-if="post.image_url" :src="post.image_url" :alt="post.title">
         <p>{{ post.content }}</p>
 
 
         <div v-if="post.reposted_post" class="bg-gray-100 p-4 my-4 border border-gray-200">
             <h1 class="text-xl">{{ post.reposted_post.title }}</h1>
+            <router-link class="text-sm text-gray-700" :to="{ name: 'user.show', params: {id: post.reposted_post.user.id}}">{{ post.user.name}}</router-link>
+
             <img class="my-3 mx-auto" v-if="post.reposted_post.image_url" :src="post.reposted_post.image_url" :alt="post.reposted_post.title">
             <p>{{ post.reposted_post.content }}</p>
         </div>
@@ -36,7 +39,7 @@
             </div>
             <p class="text-right text-slate-500 text-sm">{{ post.date }}</p>
         </div>
-        <div v-if="is_repost" class="mt-4">
+        <div v-if="isRepost" class="mt-4">
             <div>
                 <input v-model="title" class="w-96  rounded-3xl p-2 border border-slate-300 mb-3" type="text"
                        placeholder="title">
@@ -56,15 +59,22 @@
            <p v-if="isShowed" @click.prevent="isShowed = false" class="cursor-pointer">Close</p>
             <div v-if="comments && isShowed">
                 <div v-for="comment in comments" class="mt-4 pt-4 border-t border-gray-300">
-                    <p class="text-sm">{{ comment.user.name }}</p>
-                    <p>{{ comment.body }}</p>
-                    <p class="text-right text-sm">{{ comment.date }}</p>
+                    <div class="flex mb-2">
+                        <p class="text-sm mr-2">{{ comment.user.name }}</p>
+                        <p @click="setParentId(comment)" class="text-sm text-sky-500 cursor-pointer">Answer</p>
+                    </div>
+                    <p><span v-if="comment.answered_for_user" class="text-sky-400">{{ comment.answered_for_user}},</span> {{ comment.body }}</p>
+                    <p class="mt-2 text-right text-sm">{{ comment.date }}</p>
                 </div>
             </div>
         </div>
 
         <div class="mt-4">
             <div class=" mb-3">
+                <div class="flex items-center">
+                    <p v-if="comment" class="mr-2">Answered for {{ comment.user.name }}</p>
+                    <p v-if="comment" @click="comment = null" class="cursor-pointer text-sky-400 text-sm">Cancel</p>
+                </div>
                 <input v-model="body" class="w-96 rounded-3xl border p-2 border-slate-300" type="text"
                        placeholder="title">
             </div>
@@ -96,11 +106,12 @@ export default {
           title: '',
           content: '',
           body: '',
-          is_repost: false,
+          isRepost: false,
           repostedId: null,
           errors: [],
           comments: [],
-          isShowed: false
+          isShowed: false,
+          comment: null
       }
     },
 
@@ -113,13 +124,18 @@ export default {
                     post.likes_count = res.data.likes_count
                 })
         },
+        setParentId(comment) {
+            this.comment = comment
+        },
 
 
         storeComment(post) {
-            axios.post(`/api/posts/${post.id}/comment`, {body: this.body})
+            const commentId = this.comment ? this.comment.id : null
+            axios.post(`/api/posts/${post.id}/comment`, {body: this.body, parent_id: commentId })
                 .then(res => {
                     this.body = ''
                     this.comments.unshift(res.data.data)
+                    this.comment = null
                     post.comments_count++
                     this.isShowed = true
                 })
@@ -136,7 +152,7 @@ export default {
         },
         openRepost() {
             if (this.isPersonal()) return
-            this.is_repost = !this.is_repost
+            this.isRepost = !this.isRepost
         },
         repost(post) {
             if (this.isPersonal()) return

@@ -1,5 +1,6 @@
 <template>
     <div class="w-96 mx-auto">
+        <Stat :stats="stats"></Stat>
         <div class="mb-4">
             <div class=" mb-3">
                 <input v-model="title" class="w-96 rounded-3xl border p-2 border-slate-300" type="text"
@@ -23,7 +24,7 @@
                        @click.prevent="selectFile()">Image</a>
                 </div>
                 <div>
-                    <a @click.prevent="image = null" class="ml-3" href="#">Cancel</a>
+                    <a v-if="image" @click.prevent="image = null" class="ml-3" href="#">Cancel</a>
                 </div>
             </div>
             <div v-if="image">
@@ -45,6 +46,7 @@
 <script>
 import axios from "axios";
 import Post from "../../components/Post.vue";
+import Stat from "../../components/Stat.vue";
 
 export default {
     name: "Personal",
@@ -56,18 +58,29 @@ export default {
             image: null,
             posts: [],
             errors: [],
+            stats: []
         }
     },
 
     components: {
-        Post
+        Post,
+        Stat
     },
 
     mounted() {
         this.getPosts()
+        this.getStats()
+
     },
 
     methods: {
+
+        getStats() {
+            axios.post('/api/users/stats', {id: null})
+            .then( res => {
+                this.stats = res.data.data
+            })
+        },
 
         getPosts() {
             axios.get('/api/posts')
